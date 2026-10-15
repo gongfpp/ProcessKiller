@@ -1,9 +1,59 @@
 # ProcessKiller
-Use Qt to established a ProcessKiller with Gui
 
+> 一个基于 Qt Widgets 的 Windows 小工具：查看运行中的进程，并通过 PID 请求结束进程。
 
-点击查找进程将目前所有进程显示，点击“杀杀杀杀”按钮弹出模态对话框，输入欲杀进程的PID，即可干烂（此图中PID为自己，即自杀）
-查找进程按钮杀鸡用牛刀用了多线程。核心功能为调用cmd的tasklist和taskkill。
-实现总时间约为2小时，一小时写多线程，一小时解决中文乱码问题。
-!(https://img-blog.csdnimg.cn/47d72e90c4df4507844a610eaed40edf.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAZ29uZ2ZwcA==,size_20,color_FFFFFF,t_70,g_se,x_16)
+<p align="center">
+  <img src="docs/images/processkiller.png" width="784" alt="ProcessKiller 显示 Windows 进程列表与 PID 输入对话框">
+</p>
 
+<p align="center"><sub>截图取自本 README 原先引用的 <a href="https://img-blog.csdnimg.cn/47d72e90c4df4507844a610eaed40edf.png?x-oss-process=image/watermark,type_ZHJvaWRzYW5zZmFsbGJhY2s,shadow_50,text_Q1NETiBAZ29uZ2ZwcA==,size_20,color_FFFFFF,t_70,g_se,x_16">CSDN 原图</a>，保留原站水印。这是已有截图，不是本次文档更新期间重新运行程序后截取的。</sub></p>
+
+## 功能
+
+- **查看进程：** 调用 Windows `tasklist.exe`，并在窗口中显示输出。
+- **按 PID 结束进程：** 弹出输入框，读取 PID 后调用 `taskkill`。
+- **避免界面阻塞：** 通过 Qt 线程池执行进程列表查询。
+
+## 构建与运行
+
+### 环境要求
+
+- Windows（程序调用 `tasklist.exe` 和 `taskkill`）。
+- Qt Creator，以及包含 **Qt Widgets** 的 Windows Desktop Kit；编译器需与所选 Qt Kit 匹配（MSVC 或 MinGW）。
+- 项目使用 qmake（`ProcessKiller.pro`）并启用 C++11。
+
+### 使用 Qt Creator
+
+1. 在 Qt Creator 中打开 `ProcessKiller.pro`。
+2. 选择并配置已安装的 Windows Desktop Kit。
+3. 构建项目，然后在 Qt Creator 中运行。
+
+### 使用命令行
+
+在与 Qt Kit 匹配的开发者命令行中运行 qmake，再使用该 Kit 对应的 make 工具：
+
+```bat
+mkdir build
+cd build
+qmake ..\ProcessKiller.pro
+mingw32-make
+```
+
+若使用 MSVC Kit，请在对应的 Qt/MSVC 环境中运行 qmake，并将 `mingw32-make` 替换为 `nmake`。
+
+## 使用方法
+
+1. 点击 **查找进程**，刷新进程列表。
+2. 找到目标进程并记下 PID。
+3. 点击结束进程按钮，在对话框中输入 PID；选择 **Cancel** 可取消操作。
+
+## 安全提示
+
+- 对话框接收的是 PID，不会自动选中或校验列表中的某一行。确认前请核对 PID 和进程名。
+- 可以输入 ProcessKiller 自身的 PID 并关闭程序；截图展示的就是这一情形。
+- Windows 可能拒绝结束受保护或以更高权限运行的进程。不要尝试结束 Windows 系统进程；误操作可能关闭应用或影响系统稳定性。
+
+## 已知限制
+
+- 进程列表是 `tasklist` 的纯文本输出；没有搜索、筛选、排序或进程详情视图。
+- 仓库未附预编译发布包，也没有自动化测试套件。
