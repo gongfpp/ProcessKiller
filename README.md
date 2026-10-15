@@ -19,7 +19,7 @@
 ### 环境要求
 
 - Windows（程序调用 `tasklist.exe` 和 `taskkill`）。
-- Qt Creator，以及包含 **Qt Widgets** 的 Windows Desktop Kit；编译器需与所选 Qt Kit 匹配（MSVC 或 MinGW）。
+- **推荐 Qt 5** 与 Qt Creator，以及包含 **Qt Widgets** 的 Windows Desktop Kit；编译器需与所选 Qt Kit 匹配（MSVC 或 MinGW）。源码包含 `QTextCodec`，而 `.pro` 未启用 Qt 6 的 Core5Compat；Qt 6 Kit 不能直接按当前配置构建。
 - 项目使用 qmake（`ProcessKiller.pro`）并启用 C++11。
 
 ### 使用 Qt Creator
@@ -45,10 +45,11 @@ mingw32-make
 
 1. 点击 **查找进程**，刷新进程列表。
 2. 找到目标进程并记下 PID。
-3. 点击结束进程按钮，在对话框中输入 PID；选择 **Cancel** 可取消操作。
+3. 点击结束进程按钮，在对话框中输入目标 PID 并确认。
 
 ## 安全提示
 
+- 当前实现未检查 PID 对话框的确认/取消状态；点击 **Cancel** 后仍会继续调用 `taskkill`，并传入空 PID。不要把 Cancel 当作可靠的取消操作。
 - 对话框接收的是 PID，不会自动选中或校验列表中的某一行。确认前请核对 PID 和进程名。
 - 可以输入 ProcessKiller 自身的 PID 并关闭程序；截图展示的就是这一情形。
 - Windows 可能拒绝结束受保护或以更高权限运行的进程。不要尝试结束 Windows 系统进程；误操作可能关闭应用或影响系统稳定性。
